@@ -46,7 +46,6 @@ from struct import Struct
 from operator import xor
 from itertools import izip, starmap
 
-
 _pack_int = Struct('>I').pack
 
 
@@ -63,10 +62,12 @@ def pbkdf2_bin(data, salt, iterations=1000, keylen=24, hashfunc=None):
     """
     hashfunc = hashfunc or hashlib.sha1
     mac = hmac.new(data, None, hashfunc)
+
     def _pseudorandom(x, mac=mac):
         h = mac.copy()
         h.update(x)
         return map(ord, h.digest())
+
     buf = []
     for block in xrange(1, -(-keylen // mac.digest_size) + 1):
         rv = u = _pseudorandom(salt + _pack_int(block))
@@ -79,6 +80,7 @@ def pbkdf2_bin(data, salt, iterations=1000, keylen=24, hashfunc=None):
 
 def test():
     failed = []
+
     def check(data, salt, iterations, keylen, expected):
         rv = pbkdf2_hex(data, salt, iterations, keylen)
         if rv != expected:

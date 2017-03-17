@@ -46,59 +46,61 @@ from lazagne.softwares.memory.memorydump import MemoryDump
 # php
 from lazagne.softwares.php.composer import Composer
 
+
 def get_categories():
-	category = {
-		'chats': {'help': 'Chat clients supported'},
-		'sysadmin': {'help': 'SCP/SSH/FTP/FTPS clients supported'},
-		'database': {'help': 'SQL/NoSQL clients supported'},
-		'svn': {'help': 'SVN clients supported'},
-		'git': {'help': 'GIT clients supported'},
-		'maven': {'help': 'Maven java build tool'},
-		'php': {'help': 'PHP build tool'},
-		'mails': {'help': 'Email clients supported'},
-		'memory': {'help': 'Retrieve passwords from memory'},
-		'wifi': {'help': 'Wifi'},
-		'browsers': {'help': 'Web browsers supported'},
-		'windows': {'help': 'Windows credentials (credential manager, etc.)'},
-		'games': {'help': 'Games etc.'}
-	}
-	return category
-	
+    category = {
+        'chats': {'help': 'Chat clients supported'},
+        'sysadmin': {'help': 'SCP/SSH/FTP/FTPS clients supported'},
+        'database': {'help': 'SQL/NoSQL clients supported'},
+        'svn': {'help': 'SVN clients supported'},
+        'git': {'help': 'GIT clients supported'},
+        'maven': {'help': 'Maven java build tool'},
+        'php': {'help': 'PHP build tool'},
+        'mails': {'help': 'Email clients supported'},
+        'memory': {'help': 'Retrieve passwords from memory'},
+        'wifi': {'help': 'Wifi'},
+        'browsers': {'help': 'Web browsers supported'},
+        'windows': {'help': 'Windows credentials (credential manager, etc.)'},
+        'games': {'help': 'Games etc.'}
+    }
+    return category
+
+
 def get_modules():
-	moduleNames = [
-		ApacheDirectoryStudio(),
-		Dbvisualizer(), 
-		Dot_net(),
-		Chrome(), 
-		CoreFTP(), 
-		Cyberduck(),
-		Filezilla(), 
-		FtpNavigator(), 
-		GalconFusion(),
-		GitForWindows(),
-		Hashes(),
-		IE(),
-		Jitsi(),
-		KalypsoMedia(),
-		Keepass(),
-		MavenRepositories(),
-		MemoryDump(),
-		Mozilla(),
-		Network(),
-		OpenSSHForWindows(), 
-		Opera(),
-		Outlook(),
-		Pidgin(),
-		Puttycm(),
-		Robomongo(),
-      	RoguesTale(),
-		Tortoise(), 
-		Skype(), 
-		SQLDeveloper(), 
-		Squirrel(),
-		Turba(),
-		Wifi(), 
-		WinSCP(),
-		Composer()
-	]
-	return moduleNames
+    moduleNames = [
+        ApacheDirectoryStudio(),
+        Dbvisualizer(),
+        Dot_net(),
+        Chrome(),
+        CoreFTP(),
+        Cyberduck(),
+        Filezilla(),
+        FtpNavigator(),
+        GalconFusion(),
+        GitForWindows(),
+        Hashes(),
+        IE(),
+        Jitsi(),
+        KalypsoMedia(),
+        Keepass(),
+        MavenRepositories(),
+        MemoryDump(),
+        Mozilla(),
+        Network(),
+        OpenSSHForWindows(),
+        Opera(),
+        Outlook(),
+        Pidgin(),
+        Puttycm(),
+        Robomongo(),
+        RoguesTale(),
+        Tortoise(),
+        Skype(),
+        SQLDeveloper(),
+        Squirrel(),
+        Turba(),
+        Wifi(),
+        WinSCP(),
+        Composer()
+    ]
+    return moduleNames

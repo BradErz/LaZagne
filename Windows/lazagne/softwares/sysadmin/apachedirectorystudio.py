@@ -4,14 +4,14 @@ from lazagne.config.constant import *
 from lazagne.config.moduleInfo import ModuleInfo
 import xml.etree.ElementTree as ET
 
-class ApacheDirectoryStudio(ModuleInfo):
 
+class ApacheDirectoryStudio(ModuleInfo):
     def __init__(self):
-        options = {'command': '-ads', 'action': 'store_true', 'dest': 'apachedirectorystudio', 'help': 'Apache Directory Studio'}
+        options = {'command': '-ads', 'action': 'store_true', 'dest': 'apachedirectorystudio',
+                   'help': 'Apache Directory Studio'}
         ModuleInfo.__init__(self, 'apachedirectorystudio', 'sysadmin', options)
         # Interesting XML attributes in ADS connection configuration
         self.attr_to_extract = ["host", "port", "bindPrincipal", "bindPassword", "authMethod"]
-
 
     def extract_connections_credentials(self):
         """
@@ -20,7 +20,8 @@ class ApacheDirectoryStudio(ModuleInfo):
         :return: List of dict in which one dict contains all information for a connection.
         """
         repos_creds = []
-        connection_file_location = constant.profile["USERPROFILE"] + "\\.ApacheDirectoryStudio\\.metadata\\.plugins\\org.apache.directory.studio.connection.core\\connections.xml"
+        connection_file_location = constant.profile[
+                                       "USERPROFILE"] + "\\.ApacheDirectoryStudio\\.metadata\\.plugins\\org.apache.directory.studio.connection.core\\connections.xml"
         if os.path.isfile(connection_file_location):
             try:
                 connections = ET.parse(connection_file_location).getroot()
@@ -38,8 +39,7 @@ class ApacheDirectoryStudio(ModuleInfo):
 
         return repos_creds
 
-
-    def run(self, software_name = None):
+    def run(self, software_name=None):
         """
         Main function
         """

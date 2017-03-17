@@ -3,12 +3,13 @@ import os, sys
 from lazagne.config.write_output import print_debug
 from lazagne.config.moduleInfo import ModuleInfo
 
+
 class libsecret(ModuleInfo):
     def __init__(self):
         options = {'command': '-k', 'action': 'store_true', 'dest': 'kwallet', 'help': 'KWallet'}
         ModuleInfo.__init__(self, 'libsecret', 'wallet', options)
 
-    def run(self, software_name = None):
+    def run(self, software_name=None):
         items = []
         try:
             import secretstorage

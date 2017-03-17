@@ -6,8 +6,8 @@ from lazagne.config.header import Header
 from lazagne.config.moduleInfo import ModuleInfo
 import json
 
-class Robomongo(ModuleInfo):
 
+class Robomongo(ModuleInfo):
     def __init__(self):
         options = {'command': '-rbm', 'action': 'store_true', 'dest': 'robomongo', 'help': 'robomongo'}
         ModuleInfo.__init__(self, 'robomongo', 'database', options)
@@ -66,15 +66,17 @@ class Robomongo(ModuleInfo):
                                         else:
                                             creds["AuthMode"] = "SSH_PRIVATE_KEY"
                                             creds["Passphrase"] = connection_infos["ssh"]["passphrase"]
-                                            creds["PrivateKey"] = self.read_file_content(connection_infos["ssh"]["privateKeyFile"])
-                                            creds["PublicKey"] = self.read_file_content(connection_infos["ssh"]["publicKeyFile"])
+                                            creds["PrivateKey"] = self.read_file_content(
+                                                connection_infos["ssh"]["privateKeyFile"])
+                                            creds["PublicKey"] = self.read_file_content(
+                                                connection_infos["ssh"]["publicKeyFile"])
                                     repos_creds.append(creds)
                         except Exception as e:
                             print_debug("ERROR", "Cannot retrieve connections credentials '%s'" % e)
                             pass
         return repos_creds
 
-    def run(self, software_name = None):
+    def run(self, software_name=None):
         """
         Main function
         """
