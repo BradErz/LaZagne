@@ -8,7 +8,7 @@ from lazagne.config.moduleInfo import ModuleInfo
 
 class AWSCredentials(ModuleInfo):
     def __init__(self):
-        options = {'command': '-e', 'action': 'store_true', 'dest': 'aws-creds', 'help': 'aws credentials'}
+        options = {'command': '-a', 'action': 'store_true', 'dest': 'aws-creds', 'help': 'aws credentials'}
         ModuleInfo.__init__(self, 'AWS Credentials', 'sysadmin', options)
 
     def run(self, software_name=None):
