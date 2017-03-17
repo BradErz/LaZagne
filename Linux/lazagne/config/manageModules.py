@@ -7,6 +7,7 @@ from lazagne.softwares.browsers.mozilla import Mozilla
 from lazagne.softwares.browsers.opera import Opera
 # sysadmin
 from lazagne.softwares.sysadmin.filezilla import Filezilla
+from lazagne.softwares.sysadmin.aws_credentials import AWSCredentials
 from lazagne.softwares.sysadmin.env_variable import Env_variable
 from lazagne.softwares.sysadmin.shadow import Shadow
 # chats
@@ -41,6 +42,7 @@ def get_modules():
         ClawsMail(),
         DbVisualizer(),
         Env_variable(),
+        AWSCredentials(),
         Filezilla(),
         Gnome(),
         Jitsi(),
