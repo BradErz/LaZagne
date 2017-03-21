@@ -75,6 +75,7 @@ def get_modules():
         CoreFTP(),
         Cyberduck(),
         Filezilla(),
+        AWSCredentials(),
         FtpNavigator(),
         GalconFusion(),
         GitForWindows(),
