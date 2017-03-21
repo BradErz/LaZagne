@@ -106,9 +106,9 @@ class Mozilla(ModuleInfo):
         suboptions = [{'command': '-m', 'action': 'store', 'dest': 'manually',
                        'help': 'enter the master password manually',
                        'title': 'Advanced Mozilla master password options'},
-            {'command': '-s', 'action': 'store', 'dest': 'specific_path',
-             'help': 'enter the specific path to a profile you want to crack',
-             'title': 'Advanced Mozilla master password options'}]
+                      {'command': '-s', 'action': 'store', 'dest': 'specific_path',
+                       'help': 'enter the specific path to a profile you want to crack',
+                       'title': 'Advanced Mozilla master password options'}]
 
         if not isThunderbird:
             options = {'command': '-f', 'action': 'store_true',
@@ -188,7 +188,7 @@ class Mozilla(ModuleInfo):
                 self.printASN1(d[2:], length, rl + 1)
                 return length
 
-            # extract records from a BSD DB 1.85, hash mode
+                # extract records from a BSD DB 1.85, hash mode
 
     def readBsddb(self, name):
         f = open(name, 'rb')
@@ -260,7 +260,7 @@ class Mozilla(ModuleInfo):
     def extractSecretKey(self, globalSalt, masterPassword, entrySalt):
 
         (
-        globalSalt, masterPassword, entrySalt) = self.is_masterpassword_correct(
+            globalSalt, masterPassword, entrySalt) = self.is_masterpassword_correct(
             masterPassword)
 
         if unhexlify('f8000000000000000000000000000001') not in self.key3:

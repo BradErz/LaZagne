@@ -4,8 +4,8 @@ from lazagne.config.constant import *
 from lazagne.config.moduleInfo import ModuleInfo
 import xml.etree.ElementTree as ET
 
-class MavenRepositories(ModuleInfo):
 
+class MavenRepositories(ModuleInfo):
     def __init__(self):
         options = {'command': '-mvn', 'action': 'store_true', 'dest': 'mavenrepositories', 'help': 'Maven repositories'}
         ModuleInfo.__init__(self, 'mavenrepositories', 'maven', options)
@@ -34,7 +34,6 @@ class MavenRepositories(ModuleInfo):
                 master_password = None
 
         return master_password
-
 
     def extract_repositories_credentials(self):
         """
@@ -79,8 +78,7 @@ class MavenRepositories(ModuleInfo):
 
         return state
 
-
-    def run(self, software_name = None):
+    def run(self, software_name=None):
         """
         Main function:
 

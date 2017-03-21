@@ -6,10 +6,11 @@ from lazagne.config.moduleInfo import ModuleInfo
 from Crypto.PublicKey import RSA
 from Crypto.PublicKey import DSA
 
-class OpenSSHForWindows(ModuleInfo):
 
+class OpenSSHForWindows(ModuleInfo):
     def __init__(self):
-        options = {'command': '-winssh', 'action': 'store_true', 'dest': 'opensshforwindows', 'help': 'OpenSSH for Windows'}
+        options = {'command': '-winssh', 'action': 'store_true', 'dest': 'opensshforwindows',
+                   'help': 'OpenSSH for Windows'}
         ModuleInfo.__init__(self, 'opensshforwindows', 'sysadmin', options)
         self.key_files_location = constant.profile["USERPROFILE"] + "\\.ssh"
 
@@ -64,7 +65,7 @@ class OpenSSHForWindows(ModuleInfo):
                                 key_algorithm = None
                             # Check if the key can be loaded (used) without passphrase
                             if key_algorithm is not None and self.is_private_key_unprotected(key_content_encoded,
-                                                                                               key_algorithm):
+                                                                                             key_algorithm):
                                 keys.append(key_content_encoded)
                         except Exception as e:
                             print_debug("ERROR", "Cannot load key file '%s' '%s'" % (key_file_path, e))
@@ -72,7 +73,7 @@ class OpenSSHForWindows(ModuleInfo):
 
         return keys
 
-    def run(self, software_name = None):
+    def run(self, software_name=None):
         """
         Main function
         """

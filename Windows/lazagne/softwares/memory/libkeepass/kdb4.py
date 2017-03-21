@@ -21,29 +21,29 @@ KDB4_SIGNATURE = (0x9AA2D903, 0xB54BFB67)
 
 class KDB4Header(HeaderDictionary):
     fields = {
-        'EndOfHeader' : 0,
-        'Comment' : 1,
+        'EndOfHeader': 0,
+        'Comment': 1,
         # cipher used for the data stream after the header
-        'CipherID' : 2,
+        'CipherID': 2,
         # indicates whether decrypted data stream is gzip compressed
-        'CompressionFlags' : 3,
+        'CompressionFlags': 3,
         # 
-        'MasterSeed' : 4,
+        'MasterSeed': 4,
         # 
-        'TransformSeed' : 5,
+        'TransformSeed': 5,
         # 
-        'TransformRounds' : 6,
+        'TransformRounds': 6,
         # 
-        'EncryptionIV' : 7,
+        'EncryptionIV': 7,
         # key used to protect data in xml
-        'ProtectedStreamKey' : 8,
+        'ProtectedStreamKey': 8,
         # first 32 bytes of the decrypted data stream after the header
-        'StreamStartBytes' : 9,
+        'StreamStartBytes': 9,
         # cipher used to protect data in xml (ARC4 or Salsa20)
-        'InnerRandomStreamID' : 10,
-        }
+        'InnerRandomStreamID': 10,
+    }
 
-    fmt = { 3: '<I', 6: '<q' }
+    fmt = {3: '<I', 6: '<q'}
 
 
 class KDB4File(KDBFile):
@@ -57,7 +57,7 @@ class KDB4File(KDBFile):
             raise ValueError('Compression flag can be 0 or 1.')
         self.header.CompressionFlags = flag
 
-    #def set_comment(self, comment):
+    # def set_comment(self, comment):
     #    self.header.Comment = comment
 
     def read_from(self, stream):
@@ -93,25 +93,25 @@ class KDB4File(KDBFile):
         # 2.15 has 3.00.
         # The first 2 bytes are critical (i.e. loading will fail, if the
         # file version is too high), the last 2 bytes are informational.
-        #TODO implement version check
-        
+        # TODO implement version check
+
         # the first header field starts at byte 12 after the signature
         stream.seek(12)
-        
+
         while True:
             # field_id is a single byte
             field_id = stream_unpack(stream, None, 1, 'b')
-            
+
             # field_id >10 is undefined
             if not field_id in self.header.fields.values():
                 raise IOError('Unknown header field found.')
-            
+
             # two byte (short) length of field data
             length = stream_unpack(stream, None, 2, 'h')
             if length > 0:
                 data = stream_unpack(stream, None, length, '{}s'.format(length))
                 self.header.b[field_id] = data
-            
+
             # set position in data stream of end of header
             if field_id == 0:
                 self.header_length = stream.tell()
@@ -121,7 +121,7 @@ class KDB4File(KDBFile):
     #     """Serialize the header fields from self.header into a byte stream, prefix
     #     with file signature and version before writing header and out-buffer
     #     to `stream`.
-        
+
     #     Note, that `stream` is flushed, but not closed!"""
     #     # serialize header to stream
     #     header = bytearray()
@@ -129,7 +129,7 @@ class KDB4File(KDBFile):
     #     header.extend(struct.pack('<II', *KDB4_SIGNATURE))
     #     # and version
     #     header.extend(struct.pack('<hh', 0, 3))
-        
+
     #     field_ids = self.header.keys()
     #     field_ids.sort()
     #     field_ids.reverse() # field_id 0 must be last
@@ -139,14 +139,14 @@ class KDB4File(KDBFile):
     #         header.extend(struct.pack('<b', field_id))
     #         header.extend(struct.pack('<h', length))
     #         header.extend(struct.pack('{}s'.format(length), value))
-        
+
 
     #     # write header to stream
     #     stream.write(header)
-        
+
     #     headerHash = base64.b64encode(sha256(header))
     #     self.obj_root.Meta.HeaderHash = headerHash
-        
+
     #     # create HeaderHash if it does not exist
     #     if len(self.obj_root.Meta.xpath("HeaderHash")) < 1:
     #         etree.SubElement(self.obj_root.Meta, "HeaderHash")
@@ -160,7 +160,7 @@ class KDB4File(KDBFile):
     #         self._zip()
 
     #     self._encrypt();
-        
+
     #     # write encrypted block to stream
     #     stream.write(self.out_buffer)
     #     stream.flush()
@@ -174,11 +174,11 @@ class KDB4File(KDBFile):
         in-buffer.
         """
         super(KDB4File, self)._decrypt(stream)
-        
-        data = aes_cbc_decrypt(stream.read(), self.master_key, 
-            self.header.EncryptionIV)
+
+        data = aes_cbc_decrypt(stream.read(), self.master_key,
+                               self.header.EncryptionIV)
         data = unpad(data)
-        
+
         length = len(self.header.StreamStartBytes)
         if self.header.StreamStartBytes == data[:length]:
             # skip startbytes and wrap data in a hashed block io
@@ -196,7 +196,7 @@ class KDB4File(KDBFile):
         """
         # rebuild master key from (possibly) updated header
         self._make_master_key()
-        
+
         # make hashed block stream
         block_buffer = HashedBlockIO()
         block_buffer.write(self.out_buffer.read())
@@ -208,18 +208,18 @@ class KDB4File(KDBFile):
         block_buffer.write_block_stream(self.out_buffer)
         block_buffer.close()
         self.out_buffer.seek(0)
-        
+
         # encrypt the whole thing with header settings and master key
         data = pad(self.out_buffer.read())
-        self.out_buffer = aes_cbc_encrypt(data, self.master_key, 
-            self.header.EncryptionIV)
+        self.out_buffer = aes_cbc_encrypt(data, self.master_key,
+                                          self.header.EncryptionIV)
 
     def _unzip(self):
         """
         Inplace decompress in-buffer. Read/write position is moved to 0.
         """
         self.in_buffer.seek(0)
-        d = zlib.decompressobj(16+zlib.MAX_WBITS)
+        d = zlib.decompressobj(16 + zlib.MAX_WBITS)
         self.in_buffer = io.BytesIO(d.decompress(self.in_buffer.read()))
         self.in_buffer.seek(0)
 
@@ -244,9 +244,9 @@ class KDB4File(KDBFile):
         """
         super(KDB4File, self)._make_master_key()
         composite = sha256(''.join(self.keys))
-        tkey = transform_key(composite, 
-            self.header.TransformSeed, 
-            self.header.TransformRounds)
+        tkey = transform_key(composite,
+                             self.header.TransformSeed,
+                             self.header.TransformRounds)
         self.master_key = sha256(self.header.MasterSeed + tkey)
 
 
@@ -254,6 +254,7 @@ class KDB4File(KDBFile):
 import xml.etree.ElementTree as etree
 # from lxml import objectify
 from crypto import Salsa20
+
 
 class KDBXmlExtension:
     """
@@ -264,17 +265,18 @@ class KDBXmlExtension:
     using Salsa20. Protected elements are unprotected by default (passwords are
     in clear). You can override this with the `unprotect=False` argument.
     """
+
     def __init__(self, unprotect=True):
         self._salsa_buffer = bytearray()
         self.salsa = Salsa20(
-            sha256(self.header.ProtectedStreamKey), 
+            sha256(self.header.ProtectedStreamKey),
             KDB4_SALSA20_IV)
-        
+
         self.in_buffer.seek(0)
         # self.tree = objectify.parse(self.in_buffer)
         # self.obj_root = self.tree.getroot()
         self.obj_root = etree.fromstring(self.in_buffer.read())
-        
+
         if unprotect:
             self.unprotect()
 
@@ -300,7 +302,7 @@ class KDBXmlExtension:
     #     'ProtectedValue' attribute, it is deleted and the 'Protected' attribute
     #     is set to 'True'. The 'ProtectPassword' element in the 'Meta' section is
     #     also set to 'True'.
-        
+
     #     This does not just restore the previous protected value, but reencrypts
     #     all text values of elements with 'Protected=False'. So you could use
     #     this after modifying a password, adding a completely new entry or
@@ -379,6 +381,7 @@ class KDBXmlExtension:
         tmp = str(xor(string, self._get_salsa(len(string))))
         return base64.b64encode(tmp)
 
+
 class KDB4Reader(KDB4File, KDBXmlExtension):
     """
     Usually you would want to use the `keepass.open` context manager to open a
@@ -397,6 +400,7 @@ class KDB4Reader(KDB4File, KDBXmlExtension):
             kdb = keepass.KDB4Reader(fh, password='secret')
     
     """
+
     def __init__(self, stream=None, **credentials):
         KDB4File.__init__(self, stream, **credentials)
 
@@ -406,16 +410,15 @@ class KDB4Reader(KDB4File, KDBXmlExtension):
         # initialize only here
         KDBXmlExtension.__init__(self, unprotect)
 
-    # def write_to(self, stream, use_etree=True):
-    #     """
-    #     Write the KeePass database back to a KeePass2 compatible file.
-        
-    #     :arg stream: A file-like object or IO buffer.
-    #     :arg use_tree: Serialize the element tree to XML to save (default:
-    #         True), Set to False to write the data currently in the in-buffer
-    #         instead.
-    #     """
-    #     if use_etree:
-    #         KDBXmlExtension.write_to(self, stream)
-    #     KDB4File.write_to(self, stream)
+        # def write_to(self, stream, use_etree=True):
+        #     """
+        #     Write the KeePass database back to a KeePass2 compatible file.
 
+        #     :arg stream: A file-like object or IO buffer.
+        #     :arg use_tree: Serialize the element tree to XML to save (default:
+        #         True), Set to False to write the data currently in the in-buffer
+        #         instead.
+        #     """
+        #     if use_etree:
+        #         KDBXmlExtension.write_to(self, stream)
+        #     KDB4File.write_to(self, stream)

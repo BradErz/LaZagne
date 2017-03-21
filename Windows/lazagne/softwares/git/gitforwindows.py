@@ -4,8 +4,8 @@ from lazagne.config.constant import *
 from lazagne.config.moduleInfo import ModuleInfo
 from urlparse import urlparse
 
-class GitForWindows(ModuleInfo):
 
+class GitForWindows(ModuleInfo):
     def __init__(self):
         options = {'command': '-t', 'action': 'store_true', 'dest': 'gitforwindows', 'help': 'Git for Windows'}
         ModuleInfo.__init__(self, 'gitforwindows', 'git', options)
@@ -33,11 +33,11 @@ class GitForWindows(ModuleInfo):
 
         return pwd_found
 
-    def run(self, software_name = None):
+    def run(self, software_name=None):
         """
         Main function
         """
-       
+
         # According to the "git-credential-store" documentation:
         # Build a list of locations in which git credentials can be stored
         locations = []

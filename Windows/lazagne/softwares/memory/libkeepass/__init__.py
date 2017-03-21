@@ -10,9 +10,10 @@ BASE_SIGNATURE = 0x9AA2D903
 
 _kdb_readers = {
     # KDB3_SIGNATURE[1]: KDB3Reader,
-    #0xB54BFB66: KDB4Reader, # pre2.x may work, untested
+    # 0xB54BFB66: KDB4Reader, # pre2.x may work, untested
     KDB4_SIGNATURE[1]: KDB4Reader,
-    }
+}
+
 
 @contextmanager
 def open(filename, **credentials):
@@ -37,6 +38,7 @@ def open(filename, **credentials):
         if kdb: kdb.close()
         raise
 
+
 def add_kdb_reader(sub_signature, cls):
     """
     Add or overwrite the class used to process a KeePass file.
@@ -52,6 +54,7 @@ def add_kdb_reader(sub_signature, cls):
     """
     _kdb_readers[sub_signature] = cls
 
+
 def get_kdb_reader(signature):
     """
     Retrieve the class used to process a KeePass file by `signature`, which
@@ -60,9 +63,8 @@ def get_kdb_reader(signature):
     """
     if signature[0] != BASE_SIGNATURE:
         raise IOError('Unknown base signature.')
-    
+
     if signature[1] not in _kdb_readers:
         raise IOError('Unknown sub signature.')
-    
-    return _kdb_readers[signature[1]]
 
+    return _kdb_readers[signature[1]]
